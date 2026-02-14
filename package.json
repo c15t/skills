@@ -1,0 +1,7 @@
+{
+  "name": "c15t-skill",
+  "private": true,
+  "scripts": {
+    "validate": "bunx skills-ref validate ./c15t"
+  }
+}
