@@ -1,6 +1,6 @@
 # c15t Skill
 
-Codex skill for answering c15t v2+ implementation questions using c15t docs with explicit safety boundaries.
+Codex skill for answering c15 implementation questions using c15t docs with explicit safety boundaries. This skill is only compatable in c15t >=2.0-rc.0. 
 
 ## What is in this repo
 
