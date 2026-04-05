@@ -18,9 +18,9 @@ Only supports c15t `>=2.0.0-rc.5`. If the project uses an older version, ask abo
 c15t packages bundle their documentation. Detect the user's framework from `package.json` imports, then read docs in priority order — most specific first:
 
 1. **Framework package README** — read the one that matches the project:
-   - Next.js project → `node_modules/@c15t/nextjs/README.md`
-   - React project → `node_modules/@c15t/react/README.md`
-   - Vanilla JS → `node_modules/c15t/README.md`
+   - Next.js project → `node_modules/@c15t/nextjs/docs/README.md`
+   - React project → `node_modules/@c15t/react/docs/README.md`
+   - Vanilla JS → `node_modules/c15t/docs/README.md`
 2. **Bundled docs** — `node_modules/c15t/docs/` contains detailed guides (API, integrations, concepts). Read `docs/README.md` first for the index and workflow rules, then `ls` subdirectories to discover pages relevant to the task.
 3. **Other package READMEs** as needed — `@c15t/backend`
 
