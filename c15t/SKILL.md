@@ -49,17 +49,54 @@ Before implementing any script manually:
 
 Read `docs/script-loader.md` for custom script loading.
 
-## Styling
+## Customization Ladder
 
-- Use design tokens for colors, typography, radius, shadows, spacing, and motion — not just colors
-- Use **slots** to target individual component parts
-- Read `docs/building-ui.md` for the full theming and styling system
+Always choose the lowest-power tool that solves the task. Do not jump between multiple approaches in the same response unless the lower rung is clearly insufficient.
+
+1. Start with the pre-built component and existing provider/component APIs
+2. For copy changes, prefer `ConsentManagerProvider.options.i18n`
+3. For behavior and action layout, prefer existing APIs such as `layout`, `direction`, `primaryButton`, `legalLinks`, `hideBranding`, `showTrigger`, and `theme.consentActions`
+4. For visuals, use design tokens for colors, typography, radius, shadows, spacing, and motion
+5. For targeted subparts, use **slots**
+6. Only then consider CSS variables or className-level overrides
+7. Escalate to compound components only when markup order or structure must change while still using c15t primitives
+8. Escalate to `noStyle` only when the user wants to keep c15t structure but fully replace styling
+9. Escalate to headless only when the user needs fully custom markup and behavior
+
+For the full styling system and escalation guidance, read the framework docs for Styling Overview, Slots, Internationalization, and Headless Mode from the installed package docs before answering.
+
+## Styling Heuristics
+
+When working on the stock banner, prefer these mappings:
+
+- Banner footer background -> `theme.colors.surfaceHover`
+- Banner card background -> `theme.colors.surface`
+- Banner footer/layout styling -> `theme.slots.consentBannerFooter`
+- Banner card styling -> `theme.slots.consentBannerCard`
+- Banner title styling -> `theme.slots.consentBannerTitle`
+- Stock banner/dialog button treatment -> `theme.consentActions`
+- Copy changes -> provider `i18n`
+
+General rules:
+
+- Use design tokens for semantic color and spacing changes before raw CSS
+- Use slots when the markup is already correct and only a local part needs styling
+- Verify token-to-component mapping before assuming a token is broken
+
+## Anti-Patterns
+
+- Do not jump to raw CSS or `!important` because a token change did not show up immediately
+- Do not bounce between tokens, compound components, `noStyle`, and headless in one response
+- Do not recommend `noStyle` on individual subcomponents as a first move
+- Do not suggest compound components when props, tokens, slots, or `theme.consentActions` already solve the request
+- Do not suggest headless for styling-only requests
+- Do not lead with direct text props such as `title`, `description`, or `acceptButtonText`; treat them as one-off escape hatches, not the default path
 
 ## Translations
 
 - ALWAYS use the `i18n` option on `ConsentManagerProvider` for text changes
-- Do NOT use text props directly on components (`title`, `description`, `acceptButtonText`, etc.) — these bypass the i18n system
-- Read `docs/internationalization.md` for full i18n setup
+- Direct text props (`title`, `description`, `acceptButtonText`, etc.) are secondary convenience APIs for one-off overrides, not the default recommendation
+- Read the framework `Internationalization` doc for the installed package before making copy changes
 
 ## Mode selection (manual setup only)
 
