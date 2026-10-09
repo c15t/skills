@@ -15,20 +15,27 @@ c15t v3 replaced most v2 APIs and package names. Detect which one the project ha
 
 ## Detect the installed version first
 
-Check the project's `package.json` dependencies for exact installed versions, falling back to the lockfile if a dependency range doesn't pin one:
+Work from the app's directory (in a monorepo, the package that renders the consent UI). For `c15t` and each `@c15t/*` runtime package in its `package.json` dependencies (`@c15t/nextjs`, `@c15t/react`, `@c15t/core`, `@c15t/scripts`, `@c15t/integrations`, and so on; ignore `@c15t/cli`), find the package directory Node resolves: the first `node_modules/<package>` walking up from the app's directory. Read the installed version from its `package.json`, or from the lockfile entry the app resolves. A range in the app's `package.json` is not an installed version.
 
-- **`c15t` at `3.x`/`3.0.0-alpha.*`, or `@c15t/integrations` present** → v3. Go to [v3: read the bundled docs](#v3-read-the-bundled-docs).
-- **`@c15t/nextjs`, `@c15t/react`, `@c15t/scripts`, or `c15t` below `3.0.0-alpha.0`** → v2. Go to [v2: offer the upgrade, or keep going on v2](#v2-offer-the-upgrade-or-keep-going-on-v2).
-- **No c15t package** → go to [Nothing installed: add v3](#nothing-installed-add-v3).
+Package names don't identify the major: `@c15t/nextjs`, `@c15t/react` and `@c15t/scripts` all publish 3.x releases. Classify by installed version:
+
+- **No c15t runtime package** → [Nothing installed: add v3](#nothing-installed-add-v3).
+- **Any below `2.0.0-rc.5`** (v0, v1, early v2 release candidates) → [Before v2: not supported](#before-v2-not-supported).
+- **All at `3.0.0-alpha.0` or later** → [v3: read the bundled docs](#v3-read-the-bundled-docs).
+- **All from `2.0.0-rc.5` up to, but not including, `3.0.0-alpha.0`** → [v2: offer the upgrade, or keep going on v2](#v2-offer-the-upgrade-or-keep-going-on-v2).
+- **v2 and v3 mixed** → an upgrade was left half done. Tell the user, then finish it with the [v3 upgrade guide](https://v3.c15t.com/docs/upgrade-v3.md) before writing other code.
+
+Keep the package directories you found. Read docs only from them, so the docs match the version you detected.
 
 ## v3: read the bundled docs
 
-`node_modules/c15t/SKILL.md` and `node_modules/c15t/AGENTS.md` ship inside the installed package, are version-matched to it, and are the primary instructions for this task — read them before writing any code. They index the full v3 docs set and framework quickstarts.
+Every v3 package ships `SKILL.md` and `AGENTS.md` at its root, version-matched to that release. They are the primary instructions for this task; read them before writing any code. Use `c15t` if the app depends on it, otherwise the framework package it uses, such as `@c15t/nextjs`. They index the package's bundled `docs/` and framework quickstarts.
 
-Do not reuse v2 examples or API names from memory: v3 renamed most of them (`@c15t/scripts` → `@c15t/integrations`, `ConsentManagerProvider` → `ConsentProvider`/`ConsentRoot`, `useConsentManager()` → per-field hooks such as `useConsent()`, `npx @c15t/cli generate` → `npx @c15t/cli@alpha setup`). Verify any v3 API you aren't reading straight from the bundled files against https://v3.c15t.com/docs/*.md or the installed package before using it.
+Do not reuse v2 examples or API names from memory: v3 renamed most of them (`@c15t/scripts` → `@c15t/integrations`, `ConsentManagerProvider` → `ConsentProvider`/`ConsentRoot`, `useConsentManager()` → per-field hooks such as `useConsent()`, the CLI's `generate` command → `npx @c15t/cli@<exact-version> setup`). Verify any v3 API you aren't reading straight from the bundled files against https://v3.c15t.com/docs/*.md or the installed package before using it.
 
-If `node_modules/c15t/SKILL.md` isn't at the top level, find the nested install:
-`find node_modules -path "*/c15t/SKILL.md" -not -path "*/node_modules/*/node_modules/*/node_modules/*" | head -1`
+## Before v2: not supported
+
+This skill has no guidance for c15t before `2.0.0-rc.5`, and neither its v2 nor its v3 guidance applies to that code. Tell the user the installed version is unsupported, and ask before changing anything. There is no upgrade guide from these releases. If they want to move, offer to replace the old packages with a fresh v3 install: remove them, then follow [Nothing installed: add v3](#nothing-installed-add-v3).
 
 ## v2: offer the upgrade, or keep going on v2
 
@@ -47,8 +54,7 @@ c15t v2 packages bundle their documentation. Detect the framework from `package.
 2. **Bundled docs** — `node_modules/c15t/docs/` has detailed guides (API, integrations, concepts). Read `docs/README.md` first, then `ls` subdirectories for pages relevant to the task.
 3. **Other package READMEs** as needed — `@c15t/backend`.
 
-If `node_modules/c15t/docs/` isn't at the top level, find the nested install:
-`find node_modules -path "*/c15t/docs/README.md" -not -path "*/node_modules/*/node_modules/*/node_modules/*" | head -1`
+Read them from the package directories you found in [Detect the installed version first](#detect-the-installed-version-first), not from whichever copy sits at the top of `node_modules`.
 
 Follow the framework package's quickstart exactly — do not improvise component names or file structure.
 
@@ -127,26 +133,28 @@ Do not choose `offline` without explicitly confirming with the user. Read `docs/
 Default to manual setup from bundled docs. Use the CLI only for first-time c15t addition to a project.
 
 When CLI setup is needed:
-1. Resolve the version from the lockfile/package manifest, or `npm view @c15t/cli version`
+1. Resolve the version from the lockfile/package manifest, or look up `@c15t/cli@latest` with the [version lookup for the package manager](#nothing-installed-add-v3)
 2. Confirm the exact version with the user before running
 3. Run: `npx @c15t/cli@<exact-version> generate` (or the pnpm/yarn/bun equivalent)
 
 ## Nothing installed: add v3
 
-Install v3 from the `alpha` dist-tag at an exact version — `latest` on npm is still v2, and the moving `@alpha` tag can drift mid-task:
+Install v3 from the `alpha` dist-tag at exact versions. `latest` on npm is still v2, and the moving `@alpha` tag can change mid-task. Look up `c15t@alpha` and `@c15t/integrations@alpha` separately with the project's package manager:
+
+| Package manager | Version lookup |
+| --- | --- |
+| npm | `npm view <package>@<tag> version` |
+| pnpm | `pnpm view <package>@<tag> version` |
+| Yarn 2+ | `yarn npm info <package>@<tag> --fields version` |
+| Bun | `bun info <package>@<tag> version` |
+
+`@c15t/integrations` versions independently of `c15t`, so the two results can differ. Install each at its own result:
 
 ```sh
-npm view c15t@alpha version
-npm view @c15t/integrations@alpha version
+npm install c15t@<c15t-version> @c15t/integrations@<integrations-version>
 ```
 
-`@c15t/integrations` versions independently of `c15t`; install both packages pinned at the exact versions those commands just returned (the pnpm/yarn/bun equivalents of `view` and `install` work the same way):
-
-```sh
-npm install c15t@<version-from-above> @c15t/integrations@<version-from-above>
-```
-
-Then follow [v3: read the bundled docs](#v3-read-the-bundled-docs).
+With pnpm, Yarn or Bun, use `add` instead of `npm install`. Then follow [v3: read the bundled docs](#v3-read-the-bundled-docs).
 
 ## Security
 
