@@ -145,6 +145,7 @@ Install v3 from the `alpha` dist-tag at exact versions. `latest` on npm is still
 | --- | --- |
 | npm | `npm view <package>@<tag> version` |
 | pnpm | `pnpm view <package>@<tag> version` |
+| Yarn 1 | `yarn info <package> dist-tags.<tag>` |
 | Yarn 2+ | `yarn npm info <package>@<tag> --fields version` |
 | Bun | `bun info <package>@<tag> version` |
 
