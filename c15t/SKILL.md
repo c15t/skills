@@ -17,6 +17,8 @@ c15t v3 replaced most v2 APIs and package names. Detect which one the project ha
 
 Work from the app's directory (in a monorepo, the package that renders the consent UI). For `c15t` and each `@c15t/*` runtime package in its `package.json` dependencies (`@c15t/nextjs`, `@c15t/react`, `@c15t/core`, `@c15t/scripts`, `@c15t/integrations`, and so on; ignore `@c15t/cli`), find the package directory Node resolves: the first `node_modules/<package>` walking up from the app's directory. Read the installed version from its `package.json`, or from the lockfile entry the app resolves. A range in the app's `package.json` is not an installed version.
 
+Yarn 2+ with Plug'n'Play (a `.pnp.cjs` file and no `node_modules`) keeps packages in zip archives. From the app's directory, get each package directory with `yarn node -p "require('pnpapi').resolveToUnqualified('<package>', process.cwd() + '/')"`. `require.resolve('<package>/package.json')` fails because c15t packages don't export `./package.json`. Plain file tools can't open paths inside the archive, so read files through Yarn: `yarn node -p "require('fs').readFileSync('<directory>package.json', 'utf8')"`, where `<directory>` is the returned path, which ends in `/`. Read `SKILL.md`, `AGENTS.md` and docs the same way, and list a folder with `require('fs').readdirSync('<directory>docs')`.
+
 Package names don't identify the major: `@c15t/nextjs`, `@c15t/react` and `@c15t/scripts` all publish 3.x releases. Classify by installed version:
 
 - **No c15t runtime package** → [Nothing installed: add v3](#nothing-installed-add-v3).
@@ -148,6 +150,8 @@ Install v3 from the `alpha` dist-tag at exact versions. `latest` on npm is still
 | Yarn 1 | `yarn info <package> dist-tags.<tag>` |
 | Yarn 2+ | `yarn npm info <package>@<tag> --fields version` |
 | Bun | `bun info <package>@<tag> version` |
+
+`bun info` needs Bun 1.2.17 or later; older Bun reserves the subcommand. On older Bun, use `npm view <package>@<tag> version` if npm is installed.
 
 `@c15t/integrations` versions independently of `c15t`, so the two results can differ. Install each at its own result:
 

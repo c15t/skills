@@ -10,7 +10,7 @@ Skill instructions for working with c15t consent-management docs, APIs, and inte
 - Pre-v2 projects (below `2.0.0-rc.5`): not covered; offers to replace c15t with a fresh v3 install.
 - Nothing installed: resolves and pins an exact v3 version from the `alpha` dist-tag before installing.
 - Intended for Next.js, React, and JavaScript c15t work.
-- Reads bundled documentation from `node_modules` for an installed project. Adding c15t to a project with nothing installed needs registry lookups to resolve the current alpha versions.
+- Reads bundled documentation from the installed packages: `node_modules`, or Yarn's Plug'n'Play archives read through `yarn node`. Adding c15t to a project with nothing installed needs registry lookups to resolve the current alpha versions.
 
 ## Repository Layout
 
